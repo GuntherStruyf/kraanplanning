@@ -1,0 +1,7 @@
+This repository contains matlab scripts for planning gantry crane task sheets:
+i.e. generate a valid order of tasks, valid meaning:
+- cranes may not collide
+- trucks must first be unloaded, before they can be reloaded
+- ...
+
+There are data generating scripts to populate a test-set, this is filled randomly.
