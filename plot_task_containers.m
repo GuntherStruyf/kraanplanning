@@ -16,5 +16,6 @@ function plot_task_containers( loadon, terminal, Ncranes,crane_overlap)
 	scatter3(loadon_pos(:,1),loadon_pos(:,2),loadon_pos(:,3),75,loadon_pos(:,3),'filled');
 	xlim([0 terminal_dim(1)+1]);
 	ylim([0 terminal_dim(2)+1]);
-	zlim([1 size(terminal,3)+1]);	
+	zlim([1 size(terminal,3)+1]);
+	title('task containers');
 end

@@ -12,7 +12,7 @@ function terminal = populate_terminal( dim,N)
 	% first check if this population is feasible
 	M=prod(dim); % we use this again later
 	if M<N
-		error('Couldn''t fit that many containers in this dimensions');
+		error('Can''t fit that many containers in this dimensions');
 	end
 	terminal = [1:N zeros(1,M-N)];		% N integers, followed by zeros
 	terminal = terminal(randperm(M));	% shuffled above
