@@ -58,7 +58,8 @@ function [tasks, ordered_taskpairs, truckArrivalTime] = create_tasks( Ntrucks, t
 	for i = 1:Nunload
 		tasks(i) = Task(	Location(truck_loc(truck_unload(i),:))	, ...
 							Location(drop_loc(i,:))				, ...
-							truckArrivalTime(truck_unload(i))		);
+							truckArrivalTime(truck_unload(i))	, ...
+							truck_unload(i)						);
 	end
 	
 	%% LOADING TASKS
@@ -71,18 +72,16 @@ function [tasks, ordered_taskpairs, truckArrivalTime] = create_tasks( Ntrucks, t
 	truck_load = truck_load(randperm(Ntrucks)); % shuffle
 	truck_load = truck_load(1:Nload); % not necessary, but for clarity
 	
-	% pick containers to load from the terminal
-	cont_load = 1:Ncontainers;
-	cont_load = cont_load(randperm(Ncontainers)); % shuffle
-	cont_load = cont_load(1:Nload); % not necessary, but for clarity
-	
 	% convert to tasks
 	tasks(Nunload+Nload) = Task; % preallocate memory
+	empty_tasks =[];
 	for i = 1:Nload
 		% the truck stand on position x, find the range of containers that
 		% the cranes can deliver to this x position
 		xspan = possible_terminal_region(truck_loc(truck_load(i),1), cranes);
-		if ~isempty(xspan)
+		if isempty(xspan) % truck position is of out any crane range
+			empty_tasks = [empty_tasks Nunload+i];
+		else
 			% get the containers in this range
 			cont_possible = unique(terminal(xspan,:,:));
 			% randomly pick one of them
@@ -90,25 +89,37 @@ function [tasks, ordered_taskpairs, truckArrivalTime] = create_tasks( Ntrucks, t
 			% convert to xyz indicies
 			xyz = findContainer(terminal,cont_possible(rnd));
 			% detect for nill container
-			if ~all(xyz ==[0 0 0])
+			if all(xyz ==[0 0 0])
+				empty_tasks = [empty_tasks Nunload+i];
+			else
 				% save task
 				tasks(Nunload+i) = Task(Location(xyz + [0 truckLanes 0])		, ...
 										Location(truck_loc(truck_load(i),:))	, ...
-										truckArrivalTime(truck_load(i))			);
+										truckArrivalTime(truck_load(i))			, ...
+										truck_load(i)							);
 				% remove container from terminal, so it can't be chosen again
 				terminal(xyz(1),xyz(2),xyz(3))=0;
 			end
 		end
-		
 	end
+	tasks(empty_tasks) = []; % remove empty tasks
+	Nload = Nload - length(empty_tasks);
 	
 	%% DETECT ORDER OF EXECUTION RULES
 	
 	% loop through all unloading tasks, if there exists a loading task for
 	% the same truck -> apply order rule on these two tasks
+	ordered_taskpairs = [];
+	for i=1:Nunload % loop through all unloading tasks
+		for j=Nunload+1:Nunload+Nload % loop through all loading tasks
+			if tasks(i).TruckID == tasks(j).TruckID
+				ordered_taskpairs = [ordered_taskpairs ; i j];
+				break
+			end
+		end
+	end
 	
 	% ...
-	ordered_taskpairs = [];
 	
 end
 

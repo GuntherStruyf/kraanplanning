@@ -25,20 +25,27 @@ Ncranes = 3;				% number of cranes
 crane_overlap = 2;			% expressed in number of containers
 
 %% INITIAL SETUP
+
 % width of the working area of one crane
 crane_area = (terminal_dim(1) - crane_overlap)/Ncranes+crane_overlap;
+
 % preallocate memory
 cranes(Ncranes) = Crane;
 % set first crane
 cranes(1) = Crane(crane_area,1);
+% and also the others
 for i = 2:Ncranes
 	cranes(i) = Crane(crane_area,cranes(i-1).Xstart+crane_area-crane_overlap);
 end
 
 %% INPUT
 
+% fill the terminal randomly with containers
 terminal = populate_terminal(terminal_dim,Ncontainers);
+% generate some tasks
 [tasks, ordered_taskpairs, truckArrivalTime] = create_tasks(Ntrucks, terminal, cranes, maxArrivalTime, truckLanes, dropZoneWidth );
+% so the total number of tasks is:
+Ntasks = length(tasks);
 
 %% DIVIDE TASKS
 
@@ -81,10 +88,21 @@ terminal = populate_terminal(terminal_dim,Ncontainers);
 %% SET TASK ORDER
 
 % let's keep it easy for now: firstly offload everything, then load
-
+exec_order = 1:Ntasks;
+% for easy analysis, calculate the inverse of this exec_order
+% ie an array contain the exec number for each task:
+inv_exec_order(exec_order) = 1:Ntasks;
 
 
 %% CHECK CONDITIONS
 
+for i=1:size(ordered_taskpairs,1)
+	if inv_exec_order(ordered_taskpairs(i,1))>inv_exec_order(ordered_taskpairs(i,2))
+		warning('CranePlanning:TaskExecOrder','Task %d must be handled before task %d',ordered_taskpairs(i,1),ordered_taskpairs(i,2));
+	end
+end
+
+
+%% SIMULATE TASK EXECUTION
 
 
