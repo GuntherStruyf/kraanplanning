@@ -1,10 +1,10 @@
-function total_time = simulate_planning( tasks, cranes, exec_order, truckArrivalTime, initial_terminal_state,MaxCraneSpeeds,handlingTime )
+function [total_time , craneposX, craneposY]= simulate_planning( tasks, cranes, exec_order, truckArrivalTime, initial_terminal_state,MaxCraneSpeeds,handlingTime )
 %SIMULATE_PLANNING simulate the proposed execution order of the tasks
 % at each time increment: either progress each crane's current task or pick
 % the next task on the task list (respecting specified execution order)
 % which the crane can execute
 
-	t=0;
+	t=1;
 	Ntasks = numel(tasks);
 	Ncranes = numel(cranes);
 	% for easy task access (in the specified execution order), reorder the
@@ -18,14 +18,27 @@ function total_time = simulate_planning( tasks, cranes, exec_order, truckArrival
 	for i = 1:Ncranes
 		cranes(i).status = CraneStatus.AwaitingOrders;
 	end
-		
+	
+	% preallocate memory for crane positions
+	% otherwise, the size of this parameter would change every time step
+	craneposX = zeros(500,Ncranes);
+	craneposY = zeros(500,Ncranes);
 	% actual simulation
 	while 1
 		% check if all tasks are completed
 		if allTasksCompleted(tasks);
 			break;
 		end
+		M=size(craneposX,1);
+		if t>size(craneposX,1) % if t has become larger than foreseen
+			% enlarge the position vectors
+			craneposX(M+500,3)=0;
+			craneposY(M+500,3)=0;
+		end
 		for i=1:Ncranes
+			craneposX(t,i)=cranes(i).x;
+			craneposY(t,i)=cranes(i).y;
+			
 			if cranes(i).status == CraneStatus.AwaitingOrders
 				% pick a new task
 				for j=1:Ntasks
@@ -81,6 +94,10 @@ function total_time = simulate_planning( tasks, cranes, exec_order, truckArrival
 		
 		t=t+1;
 	end
+	% remove empty (preallocated) positions
+	craneposX(t:end,:) = [];
+	craneposY(t:end,:) = [];
+	t=t-1;
 	
 	total_time=t;
 end

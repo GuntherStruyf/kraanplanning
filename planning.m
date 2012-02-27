@@ -110,4 +110,10 @@ end
 
 %% SIMULATE TASK EXECUTION
 
-total_time = simulate_planning(tasks, cranes, exec_order, truckArrivalTime, terminal ,[crane_track_speed crane_gantry_speed], handlingTime)
+[total_time , craneposX, craneposY] = simulate_planning(tasks, cranes, exec_order, truckArrivalTime, terminal ,[crane_track_speed crane_gantry_speed], handlingTime);
+fprintf('Total execution time: %4ds\n',total_time);
+
+%% PRODUCE NICE IMAGES
+figure
+plot(craneposX,craneposY);
+xlabel('x');ylabel('y','Rotation',0)
