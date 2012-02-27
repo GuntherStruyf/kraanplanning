@@ -1,7 +1,9 @@
 classdef (Enumeration) CraneStatus < int32
 	enumeration
-		statDisabled			(0)
-		statWaitingForOrders	(1)
-		statWorking				(2)
+		Disabled			(0)
+		AwaitingOrders		(1)
+		MoveToOrigin		(2)
+		MoveToDestination	(3)
+		HandlingContainer	(4)
 	end
 end

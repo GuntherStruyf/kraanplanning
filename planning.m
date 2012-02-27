@@ -12,14 +12,19 @@ container_width		= 2.438;	% 8ft
 container_height	= 2.591;	% 8.5ft
 
 Ncontainers = 50;			% number of containers in the terminal
-Ntrucks = 50;				% number of trucks
+Ntrucks = 10;				% number of trucks
 truckLanes = 13;			% number of adjacent trucklanes
 terminal_dim = [29 5 4];	% dimensions of the terminal, [length width height]
 dropZoneWidth = 5;			% dropzone width
 maxArrivalTime = 300;		% max value for arrival time (seconds)
+handlingTime = 50;			% how long it takes to handle one container (ie
+							% single action of putting down, picking up a
+							% container with the crane)
 
-crane_track_speed = 1;		% m/s speed along the crane's track
-crane_gantry_speed = 1;		% m/s speed along the crane's gantry
+crane_track_speed = 1/container_length;	
+							% containers/s speed along the crane's track
+crane_gantry_speed = 1/container_width;
+							% containres/s speed along the crane's gantry
 
 Ncranes = 3;				% number of cranes
 crane_overlap = 2;			% expressed in number of containers
@@ -105,4 +110,4 @@ end
 
 %% SIMULATE TASK EXECUTION
 
-
+total_time = simulate_planning(tasks, cranes, exec_order, truckArrivalTime, terminal ,[crane_track_speed crane_gantry_speed], handlingTime)

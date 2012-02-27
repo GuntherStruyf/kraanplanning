@@ -66,7 +66,7 @@ function [tasks, ordered_taskpairs, truckArrivalTime] = create_tasks( Ntrucks, t
 	
 	% number of trucks to offload, other trucks leave empty
 	Ncontainers = countContainers(terminal);
-	Nload = max(1+floor(rand*Ntrucks), Ncontainers);
+	Nload = min(1+floor(rand*Ntrucks), Ncontainers);
 	% pick which trucks to load
 	truck_load = 1:Ntrucks;
 	truck_load = truck_load(randperm(Ntrucks)); % shuffle
@@ -112,7 +112,7 @@ function [tasks, ordered_taskpairs, truckArrivalTime] = create_tasks( Ntrucks, t
 	ordered_taskpairs = [];
 	for i=1:Nunload % loop through all unloading tasks
 		for j=Nunload+1:Nunload+Nload % loop through all loading tasks
-			if tasks(i).TruckID == tasks(j).TruckID
+			if tasks(i).truckID == tasks(j).truckID
 				ordered_taskpairs = [ordered_taskpairs ; i j];
 				break
 			end

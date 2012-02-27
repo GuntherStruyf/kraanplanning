@@ -4,8 +4,11 @@ classdef Crane
 	%PROPERTIES
 	%	Xspan:		the working span of the crane
 	%	Xstart:		start of the crane's working span
-	%	x,y:		current position of the crane's gantry
+	%	x,y:		position of the crane's gantry
 	%	status:		current status of the crane (Disabled, Waiting, Working)
+	%	curTaskID:	the id of the current task the crane is executing
+	%	actionStart:the time at which the current action of the crane has
+	%				started
 	%
 	%CONSTRUCTOR:
 	%	Crane(Xspan, Xstart)
@@ -18,7 +21,9 @@ classdef Crane
 	properties
 		x		= 0;
 		y		= 0;
-		status	= CraneStatus.statDisabled;
+		status	= CraneStatus.Disabled;
+		curTaskID	=0;
+		actionStart	=0;
 	end
 	
 	methods(Static)
