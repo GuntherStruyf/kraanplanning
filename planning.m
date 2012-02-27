@@ -114,6 +114,18 @@ end
 fprintf('Total execution time: %4ds\n',total_time);
 
 %% PRODUCE NICE IMAGES
-figure
+figure; hold on
+% draw crane span borders
+YL = [min(craneposY(:))-1 max(craneposY(:))+1]; % get y[min, max]
+for cr = cranes
+	line(repmat(cr.Xstart,2,1)				,YL,'Color',[.8 .8 .8],'LineStyle','--');
+	line(repmat(cr.Xstart+cr.Xspan+1,2,1)	,YL,'Color',[.8 .8 .8],'LineStyle','--');
+end
+% plot crane positions
 plot(craneposX,craneposY);
 xlabel('x');ylabel('y','Rotation',0)
+% set figure limits
+ylim(YL);
+xlim([0 terminal_dim(1)+3]);
+
+

@@ -54,13 +54,41 @@ function [tasks, ordered_taskpairs, truckArrivalTime] = create_tasks( Ntrucks, t
 	truck_unload = truck_unload(1:Nunload); % not necessary, but for clarity
 	
 	% convert to tasks
+% 	tasks(Nunload) = Task; % preallocate memory
+% 	for i = 1:Nunload
+% 		tasks(i) = Task(	Location(truck_loc(truck_unload(i),:))	, ...
+% 							Location(drop_loc(i,:))				, ...
+% 							truckArrivalTime(truck_unload(i))	, ...
+% 							truck_unload(i)						);
+% 	end
+	
 	tasks(Nunload) = Task; % preallocate memory
+	empty_tasks =[];
 	for i = 1:Nunload
-		tasks(i) = Task(	Location(truck_loc(truck_unload(i),:))	, ...
-							Location(drop_loc(i,:))				, ...
-							truckArrivalTime(truck_unload(i))	, ...
-							truck_unload(i)						);
+		% the truck stand on position x, find the range of terminal
+		% locations that the cranes can offload this truck to
+		xspan = possible_terminal_region(truck_loc(truck_unload(i),1), cranes);
+		if isempty(xspan) % truck position is of out any crane range
+			empty_tasks = [empty_tasks i];
+		else
+			% pick a random x location out of the possible
+			x = xspan(1+floor(rand*numel(xspan)));
+			% pick random y location
+			y = floor(rand*dropZoneDim(2));
+			% save task
+			tasks(i) = Task(Location(truck_loc(truck_unload(i),:))			, ...
+							Location(x, y + truckLanes+ terminalDim(2), 1)	, ...
+							truckArrivalTime(truck_unload(i))				, ...
+							truck_unload(i)									);
+		end
 	end
+	tasks(empty_tasks) = []; % remove empty tasks
+	Nunload = Nunload - length(empty_tasks);
+	
+	
+	
+	
+	
 	
 	%% LOADING TASKS
 	

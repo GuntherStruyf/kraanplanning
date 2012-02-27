@@ -49,12 +49,16 @@ classdef Task
 	end
 	methods
 		function disp(obj)
-			fprintf('<a href = "matlab:help %s">%s</a>\n',class(obj),class(obj));
-			fprintf('\tOrigin:\t\t %s\n',obj.loc_origin.toString);
-			fprintf('\tDestination: %s\n',obj.loc_destination.toString);
-			fprintf('\tMin Starting time:\t%3d\n',obj.earliestStartTime);
-			fprintf('\tTruck ID:\t\t\t%3d\n',obj.truckID);
-			fprintf('\tStatus:\t\t\t\t%s\n',obj.status.toString);
+			if numel(obj)<=1
+				fprintf('<a href = "matlab:help %s">%s</a>\n',class(obj),class(obj));
+				fprintf('\tOrigin:\t\t %s\n',obj.loc_origin.toString);
+				fprintf('\tDestination: %s\n',obj.loc_destination.toString);
+				fprintf('\tMin Starting time:\t%3d\n',obj.earliestStartTime);
+				fprintf('\tTruck ID:\t\t\t%3d\n',obj.truckID);
+				fprintf('\tStatus:\t\t\t\t%s\n',obj.status.toString);
+			else
+				fprintf('\t<a href = "matlab:help %s">%s</a> array with dimensions [%s]\n',class(obj),class(obj),num2str(size(obj)));
+			end
 		end
 	end
 	

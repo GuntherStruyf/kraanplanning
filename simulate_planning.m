@@ -4,6 +4,8 @@ function [total_time , craneposX, craneposY]= simulate_planning( tasks, cranes, 
 % the next task on the task list (respecting specified execution order)
 % which the crane can execute
 
+%% INITIALIZATION
+
 	t=1;
 	Ntasks = numel(tasks);
 	Ncranes = numel(cranes);
@@ -23,7 +25,27 @@ function [total_time , craneposX, craneposY]= simulate_planning( tasks, cranes, 
 	% otherwise, the size of this parameter would change every time step
 	craneposX = zeros(500,Ncranes);
 	craneposY = zeros(500,Ncranes);
-	% actual simulation
+	
+%% DIVIDE TASKS
+	
+	% initialize crane task list:
+	crane_TaskList{Ncranes}=[];
+	
+	for i=1:Ntasks
+		possible_cranes = intersect(cell2mat(getResponsibleCranes(tasks(i).loc_origin.x,cranes)),...
+									cell2mat(getResponsibleCranes(tasks(i).loc_destination.x,cranes)));
+		if numel(possible_cranes)>1
+			% make a choice!
+			% let's choose the crane with the lowest index
+			cr_idx = min(possible_cranes);
+		else
+			% this is easier
+			cr_idx = possible_cranes;
+		end
+		crane_TaskList{cr_idx} = [crane_TaskList{cr_idx} i];
+	end
+	
+%% ACUTAL SIMULATION
 	while 1
 		% check if all tasks are completed
 		if allTasksCompleted(tasks);
@@ -40,8 +62,8 @@ function [total_time , craneposX, craneposY]= simulate_planning( tasks, cranes, 
 			craneposY(t,i)=cranes(i).y;
 			
 			if cranes(i).status == CraneStatus.AwaitingOrders
-				% pick a new task
-				for j=1:Ntasks
+				% pick a new task from the crane task list
+				for j=crane_TaskList{i}
 					% check if task is ready to execute
 					if tasks(j).status == TaskStatus.Awaiting && tasks(j).earliestStartTime<=t
 						cranes(i).curTaskID = j;
