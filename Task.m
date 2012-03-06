@@ -55,7 +55,7 @@ classdef Task
 				fprintf('\tDestination: %s\n',obj.loc_destination.toString);
 				fprintf('\tMin Starting time:\t%3d\n',obj.earliestStartTime);
 				fprintf('\tTruck ID:\t\t\t%3d\n',obj.truckID);
-				fprintf('\tStatus:\t\t\t\t%s\n',obj.status.toString);
+				fprintf('\tStatus:\t\t\t%s\n',evalc('disp(obj.status)'));
 			else
 				fprintf('\t<a href = "matlab:help %s">%s</a> array with dimensions [%s]\n',class(obj),class(obj),num2str(size(obj)));
 			end

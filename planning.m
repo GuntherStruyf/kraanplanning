@@ -28,7 +28,7 @@ end
 
 %% SIMULATE TASK EXECUTION
 
-[total_time , craneposX, craneposY] = simulate_planning(tasks, cranes, exec_order, truckArrivalTime, terminal ,[crane_track_speed crane_gantry_speed], handlingTime);
+[total_time , craneposX, craneposY] = simulate_planning(tasks, cranes, exec_order, handlingTime, terminal);
 fprintf('Total execution time: %4ds\n',total_time);
 
 

@@ -1,4 +1,4 @@
-function [total_time , craneposX, craneposY]= simulate_planning( tasks, cranes, exec_order, truckArrivalTime, initial_terminal_state,MaxCraneSpeeds,handlingTime )
+function [total_time , craneposX, craneposY]= simulate_planning( tasks, cranes, exec_order, handlingTime, initial_terminal_state)
 %SIMULATE_PLANNING simulate the proposed execution order of the tasks
 % at each time increment: either progress each crane's current task or pick
 % the next task on the task list (respecting specified execution order)
@@ -13,8 +13,8 @@ function [total_time , craneposX, craneposY]= simulate_planning( tasks, cranes, 
 	% tasks accordingly:
 	tasks(exec_order) = tasks;
 	
-	speedX = MaxCraneSpeeds(1);
-	speedY = MaxCraneSpeeds(2);
+	speedX = cranes(1).maxVelX;
+	speedY = cranes(1).maxVelY;
 	
 	% enable cranes
 	for i = 1:Ncranes
