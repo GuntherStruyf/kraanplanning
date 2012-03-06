@@ -27,14 +27,15 @@ else
 	handlingTime = 50;			% how long it takes to handle one container (ie
 								% single action of putting down, picking up a
 								% container with the crane)
+	craneWidth = 10;			% width of a crane (in meter)
 
-	% Maximum speed of the crane's track
+	% Maximum speed of the crane's track (m/s)
 	MaxCrane_track_speed = 1/container_length;	
-	% Maximum speed of the crane's gantry
+	% Maximum speed of the crane's gantry (m/s)
 	MaxCrane_gantry_speed = 1/container_width;
-	% Maximum acceleration of the crane's track
+	% Maximum acceleration of the crane's track (m/s^2)
 	MaxCrane_track_acceleration = MaxCrane_track_speed/5; % so max speed is reached in 5s	
-	% Maximum acceleration of the crane's gantry					
+	% Maximum acceleration of the crane's gantry(m/s^2)				
 	MaxCrane_gantry_acceleration = MaxCrane_gantry_speed/5;						
 	
 	
@@ -50,12 +51,12 @@ else
 	% set first crane
 	cranes(1) = Crane(crane_area,1, ...
 		1, 0, CraneStatus.Disabled, ...
-		0,0, MaxCrane_track_speed, MaxCrane_gantry_speed, MaxCrane_track_acceleration, MaxCrane_gantry_acceleration);
+		0,0, MaxCrane_track_speed, MaxCrane_gantry_speed, MaxCrane_track_acceleration, MaxCrane_gantry_acceleration,craneWidth/2);
 	% and also the others
 	for i = 2:Ncranes
 		cranes(i) = Crane(crane_area,cranes(i-1).Xstart+crane_area-crane_overlap, ...
 			cranes(i-1).Xstart+crane_area-crane_overlap, 0, CraneStatus.Disabled, ...
-			0,0, MaxCrane_track_speed, MaxCrane_gantry_speed, MaxCrane_track_acceleration, MaxCrane_gantry_acceleration);
+			0,0, MaxCrane_track_speed, MaxCrane_gantry_speed, MaxCrane_track_acceleration, MaxCrane_gantry_acceleration,craneWidth/2);
 	end
 	
 	%% INPUT (random)

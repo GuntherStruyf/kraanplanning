@@ -150,3 +150,8 @@ function [arrival x y] = move(x1,y1,x2,y2, speedX, speedY)
 	end
 	arrival = x==x2 && y==y2;
 end
+
+function is_area_free(xspan, curIndex, cranes)
+	
+	
+end

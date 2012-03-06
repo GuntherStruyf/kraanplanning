@@ -9,6 +9,8 @@ classdef Crane
 	%	maxVelX/Y:	maximum x and y velocity
 	%	maxAccX/Y:	maximum x and y acceleration
 	%
+	%	collisionWidth:	minimum distance an object has to stay away from
+	%				the crane's center (x-position) in order not to collide
 	%	status:		current status of the crane (Disabled, Waiting, Working)
 	%	curTaskID:	the id of the current task the crane is executing
 	%	actionStart:the time at which the current action of the crane has
@@ -17,7 +19,7 @@ classdef Crane
 	%CONSTRUCTOR:
 	%	Crane(Xspan, Xstart)
 	%	Crane(Xspan, Xstart, x, y, status)
-	%	Crane(Xspan, Xstart, x, y, status, velX, velY, maxVelX, maxVelY, maxAccX, maxAccY)
+	%	Crane(Xspan, Xstart, x, y, status, velX, velY, maxVelX, maxVelY, maxAccX, maxAccY, collisionWidth)
 	
 	properties(SetAccess=protected)
 		Xspan	= 0;
@@ -33,9 +35,10 @@ classdef Crane
 		maxAccX	= 0;	% acceleration, assume step profile possible
 		maxAccY	= 0;
 		
-		status	= CraneStatus.Disabled;
-		curTaskID	=0;
-		actionStart	=0;
+		collisionWidth	= 0;
+		status			= CraneStatus.Disabled;
+		curTaskID		= 0;
+		actionStart		= 0;
 	end
 	
 	methods(Static)
@@ -61,14 +64,14 @@ classdef Crane
 					else
 						error([class(obj) '(' getTypes(varargin{:}) ') constructor doesn''t exist.']);
 					end
-				case 11
+				case 12
 				% Crane(Xspan, Xstart, x, y, status, velX, velY, maxVelX,
 				% maxVelY, maxAccX, maxAccY)
-					if	cell_isa({varargin{[1:4 6:11]}},'double') && ...
+					if	cell_isa({varargin{[1:4 6:12]}},'double') && ...
 						isa(varargin{5},'CraneStatus')
 							[obj.Xspan, obj.Xstart, ...
 								obj.x, obj.y, obj.status, ...
-								obj.velX, obj.velY, obj.maxVelX, obj.maxVelY, obj.maxAccX, obj.maxAccY ...
+								obj.velX, obj.velY, obj.maxVelX, obj.maxVelY, obj.maxAccX, obj.maxAccY, obj.collisionWidth ...
 								] = varargin{:};
 					else
 						error([class(obj) '(' getTypes(varargin{:}) ') constructor doesn''t exist.']);
@@ -86,6 +89,7 @@ classdef Crane
 				fprintf('\t velocity:\t[%2.2f %2.2f]\n',obj.velX,obj.velY);
 				fprintf('\t max velocity:\t\t[%2.2f %2.2f]\n',obj.maxVelX,obj.maxVelY);
 				fprintf('\t max acceleration:\t[%2.2f %2.2f]\n',obj.maxAccX,obj.maxAccY);
+				fprintf('\t collision width:\t %2.2f\n',obj.collisionWidth);
 				fprintf('\t status:%s\n',evalc('disp(obj.status)'));
 			else
 				fprintf('\t<a href = "matlab:help %s">%s</a> array with dimensions [%s]\n',class(obj),class(obj),num2str(size(obj)));
