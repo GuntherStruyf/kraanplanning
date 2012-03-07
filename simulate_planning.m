@@ -104,9 +104,8 @@ function [total_time , craneposX, craneposY]= simulate_planning( tasks, cranes, 
 			end
 			if cranes(i).status==CraneStatus.MoveToDestination
 				% move to destination, analogous to move to origin
-				[arrival,cranes(i).x, cranes(i).y] = move(cranes(i).x,cranes(i).y,...
-					tasks(cranes(i).curTaskID).loc_destination.x, ...
-					tasks(cranes(i).curTaskID).loc_destination.y, speedX, speedY);
+				[arrival,cranes(i)] = move(cranes(i), ...
+							tasks(cranes(i).curTaskID).loc_destination);
 				if arrival
 					cranes(i).status=CraneStatus.HandlingContainer;
 					cranes(i).actionStart=t;
@@ -133,7 +132,8 @@ function retval = allTasksCompleted(tasks)
 		end
 	end
 end
-function [arrival x y] = move(x1,y1,x2,y2, speedX, speedY)
+function [isArrival crane] = move(crane, destination,dt)
+	brake_dist = crane.velX
 	if abs(x1-x2)<speedX
 		x=x2;
 	elseif x2>x1
@@ -149,6 +149,35 @@ function [arrival x y] = move(x1,y1,x2,y2, speedX, speedY)
 		y=y1-speedY;
 	end
 	arrival = x==x2 && y==y2;
+end
+function [isArrival pos vel] = move(pos,vel,dt,vmax,amax, pos_dest)
+	dx = pos_dest-pos;
+	if dx<0
+		[isArrival pos vel]=move(-pos,-vel,dt,vmax,amax,-pos_dest);
+		pos=-pos;
+		vel=-vel;
+	else
+		% when assuming triangular velocity profile: vtop = top velocity
+		% equals the following (do the math if you don't believe me ;) )
+		vtop = sqrt(dx*amax+vel^2/2);
+		
+		if vtop>vmax
+% 			vel = vmax;
+% 			pos = pos+(vel+vmax)/2*dt
+			
+		else
+			
+			
+		end
+	
+	% can we still stop in time, if we raise velocity with maxAcc?
+	brake_dist = (vel+maxAcc
+	% and what if we keep moving with current velocity, can we stop in time?
+	brake_dist = vel^2/maxacc;
+	
+	% and if we raise the velocity with maxacc?
+	brake_dist = 
+	
 end
 
 function is_area_free(xspan, curIndex, cranes)
