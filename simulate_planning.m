@@ -7,6 +7,7 @@ function [total_time , craneposX, craneposY]= simulate_planning( tasks, cranes, 
 %% INITIALIZATION
 
 	t=1;
+	dt=1;
 	Ntasks = numel(tasks);
 	Ncranes = numel(cranes);
 	% for easy task access (in the specified execution order), reorder the
@@ -76,9 +77,8 @@ function [total_time , craneposX, craneposY]= simulate_planning( tasks, cranes, 
 			end
 			if cranes(i).status==CraneStatus.MoveToOrigin
 				% move to origin
-				[arrival,cranes(i).x, cranes(i).y] = move(cranes(i).x,cranes(i).y, ...
-					tasks(cranes(i).curTaskID).loc_origin.x, ...
-					tasks(cranes(i).curTaskID).loc_origin.y, speedX,speedY);
+				[arrival,cranes(i)] = moveCrane( cranes(i), ...
+							tasks(cranes(i).curTaskID).loc_origin, dt);
 				if arrival
 					cranes(i).status=CraneStatus.HandlingContainer;
 					cranes(i).actionStart=t;
@@ -104,8 +104,8 @@ function [total_time , craneposX, craneposY]= simulate_planning( tasks, cranes, 
 			end
 			if cranes(i).status==CraneStatus.MoveToDestination
 				% move to destination, analogous to move to origin
-				[arrival,cranes(i)] = move(cranes(i), ...
-							tasks(cranes(i).curTaskID).loc_destination);
+				[arrival,cranes(i)] = moveCrane(cranes(i), ...
+							tasks(cranes(i).curTaskID).loc_destination,dt);
 				if arrival
 					cranes(i).status=CraneStatus.HandlingContainer;
 					cranes(i).actionStart=t;
@@ -113,7 +113,7 @@ function [total_time , craneposX, craneposY]= simulate_planning( tasks, cranes, 
 			end
 		end
 		
-		t=t+1;
+		t=t+dt;
 	end
 	% remove empty (preallocated) positions
 	craneposX(t:end,:) = [];
@@ -132,53 +132,14 @@ function retval = allTasksCompleted(tasks)
 		end
 	end
 end
-function [isArrival crane] = move(crane, destination,dt)
-	brake_dist = crane.velX
-	if abs(x1-x2)<speedX
-		x=x2;
-	elseif x2>x1
-		x=x1+speedX;
-	else
-		x=x1-speedX;
-	end
-	if abs(y1-y2)<speedY
-		y=y2;
-	elseif y2>y1
-		y=y1+speedY;
-	else
-		y=y1-speedY;
-	end
-	arrival = x==x2 && y==y2;
+function [isArrival crane] = moveCrane(crane, destination,dt)
+	[arrivalX crane.x crane.velX] = move_constant_acceleration( crane.x,...
+		crane.velX,dt,crane.maxVelX, crane.maxAccX,destination.x);
+	[arrivalY crane.y crane.velY] = move_constant_acceleration( crane.y,...
+		crane.velY,dt,crane.maxVelY, crane.maxAccY,destination.y);
+	isArrival = (arrivalX && arrivalY);
 end
-function [isArrival pos vel] = move(pos,vel,dt,vmax,amax, pos_dest)
-	dx = pos_dest-pos;
-	if dx<0
-		[isArrival pos vel]=move(-pos,-vel,dt,vmax,amax,-pos_dest);
-		pos=-pos;
-		vel=-vel;
-	else
-		% when assuming triangular velocity profile: vtop = top velocity
-		% equals the following (do the math if you don't believe me ;) )
-		vtop = sqrt(dx*amax+vel^2/2);
-		
-		if vtop>vmax
-% 			vel = vmax;
-% 			pos = pos+(vel+vmax)/2*dt
-			
-		else
-			
-			
-		end
-	
-	% can we still stop in time, if we raise velocity with maxAcc?
-	brake_dist = (vel+maxAcc
-	% and what if we keep moving with current velocity, can we stop in time?
-	brake_dist = vel^2/maxacc;
-	
-	% and if we raise the velocity with maxacc?
-	brake_dist = 
-	
-end
+
 
 function is_area_free(xspan, curIndex, cranes)
 	
