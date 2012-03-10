@@ -51,12 +51,12 @@ else
 	% set first crane
 	cranes(1) = Crane(crane_area,1, ...
 		1, 0, CraneStatus.Disabled, ...
-		0,0, MaxCrane_track_speed, MaxCrane_gantry_speed, MaxCrane_track_acceleration, MaxCrane_gantry_acceleration,craneWidth/2);
+		0,0, MaxCrane_track_speed, MaxCrane_gantry_speed, MaxCrane_track_acceleration, MaxCrane_gantry_acceleration,craneWidth/2,1);
 	% and also the others
 	for i = 2:Ncranes
 		cranes(i) = Crane(crane_area,cranes(i-1).Xstart+crane_area-crane_overlap, ...
 			cranes(i-1).Xstart+crane_area-crane_overlap, 0, CraneStatus.Disabled, ...
-			0,0, MaxCrane_track_speed, MaxCrane_gantry_speed, MaxCrane_track_acceleration, MaxCrane_gantry_acceleration,craneWidth/2);
+			0,0, MaxCrane_track_speed, MaxCrane_gantry_speed, MaxCrane_track_acceleration, MaxCrane_gantry_acceleration,craneWidth/2,i);
 	end
 	
 	%% INPUT (random)

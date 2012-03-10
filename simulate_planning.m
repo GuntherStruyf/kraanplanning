@@ -78,7 +78,7 @@ function [total_time , craneposX, craneposY]= simulate_planning( tasks, cranes, 
 			if cranes(i).status==CraneStatus.MoveToOrigin
 				% move to origin
 				[arrival,cranes(i)] = moveCrane( cranes(i), ...
-							tasks(cranes(i).curTaskID).loc_origin, dt);
+							tasks(cranes(i).curTaskID).loc_origin, dt,cranes);
 				if arrival
 					cranes(i).status=CraneStatus.HandlingContainer;
 					cranes(i).actionStart=t;
@@ -105,7 +105,7 @@ function [total_time , craneposX, craneposY]= simulate_planning( tasks, cranes, 
 			if cranes(i).status==CraneStatus.MoveToDestination
 				% move to destination, analogous to move to origin
 				[arrival,cranes(i)] = moveCrane(cranes(i), ...
-							tasks(cranes(i).curTaskID).loc_destination,dt);
+							tasks(cranes(i).curTaskID).loc_destination,dt,cranes);
 				if arrival
 					cranes(i).status=CraneStatus.HandlingContainer;
 					cranes(i).actionStart=t;
@@ -132,16 +132,45 @@ function retval = allTasksCompleted(tasks)
 		end
 	end
 end
-function [isArrival crane] = moveCrane(crane, destination,dt)
-	[arrivalX crane.x crane.velX] = move_constant_acceleration( crane.x,...
-		crane.velX,dt,crane.maxVelX, crane.maxAccX,destination.x);
+function [isArrival crane] = moveCrane(crane, destination,dt,cranes)
+	breakdist=crane.getBreakDistance;
+	breakdistX=sign(breakdist(1))*ceil(abs(breakdist(1)));
+	xbreakspan=0:sign(breakdistX):breakdistX;
+	
+	blocking_crane=is_area_free(crane.x+xbreakspan,crane.id,cranes);
+	if blocking_crane<=crane.id
+		% lower id = priority
+		[arrivalX crane.x crane.velX] = move_constant_acceleration( crane.x,...
+			crane.velX,dt,crane.maxVelX, crane.maxAccX,destination.x);
+	else
+		% back off, it's always the crane with higher id (= highest
+		% xposition) that has to back off
+		overlap=intersect(crane.Xspan,cranes(blocking_crane).Xspan);
+		newDestX = overlap(end)+1;
+		
+		[~, crane.x crane.velX] = move_constant_acceleration( crane.x,...
+			crane.velX,dt,crane.maxVelX, crane.maxAccX,newDestX);
+		arrivalX=(crane.x==destination.x);
+	end
 	[arrivalY crane.y crane.velY] = move_constant_acceleration( crane.y,...
 		crane.velY,dt,crane.maxVelY, crane.maxAccY,destination.y);
 	isArrival = (arrivalX && arrivalY);
 end
 
-
-function is_area_free(xspan, curIndex, cranes)
-	
-	
+function val = is_area_free(xspan, curCraneID, cranes)
+	% returns 0 if no crane is blocking, else return the id of the blocking
+	% crane
+	val=0;
+	if ~isempty(xspan)
+		minx=min(xspan);
+		maxx=max(xspan);
+		for i=1:numel(cranes)
+			if cranes(i).id~=curCraneID
+				if minx<=cranes(i).x && cranes(i).x<=maxx
+					val=cranes(i).id;
+					break;
+				end
+			end
+		end
+	end
 end

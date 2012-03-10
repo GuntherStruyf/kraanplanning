@@ -19,7 +19,7 @@ classdef Crane
 	%CONSTRUCTOR:
 	%	Crane(Xspan, Xstart)
 	%	Crane(Xspan, Xstart, x, y, status)
-	%	Crane(Xspan, Xstart, x, y, status, velX, velY, maxVelX, maxVelY, maxAccX, maxAccY, collisionWidth)
+	%	Crane(Xspan, Xstart, x, y, status, velX, velY, maxVelX, maxVelY, maxAccX, maxAccY, collisionWidth, id)
 	
 	properties(SetAccess=protected)
 		Xspan	= 0;
@@ -35,6 +35,7 @@ classdef Crane
 		maxAccX	= 0;	% acceleration, assume step profile possible
 		maxAccY	= 0;
 		
+		id		= 0;
 		collisionWidth	= 0;
 		status			= CraneStatus.Disabled;
 		curTaskID		= 0;
@@ -64,14 +65,14 @@ classdef Crane
 					else
 						error([class(obj) '(' getTypes(varargin{:}) ') constructor doesn''t exist.']);
 					end
-				case 12
+				case 13
 				% Crane(Xspan, Xstart, x, y, status, velX, velY, maxVelX,
 				% maxVelY, maxAccX, maxAccY)
-					if	cell_isa({varargin{[1:4 6:12]}},'double') && ...
+					if	cell_isa({varargin{[1:4 6:13]}},'double') && ...
 						isa(varargin{5},'CraneStatus')
 							[obj.Xspan, obj.Xstart, ...
 								obj.x, obj.y, obj.status, ...
-								obj.velX, obj.velY, obj.maxVelX, obj.maxVelY, obj.maxAccX, obj.maxAccY, obj.collisionWidth ...
+								obj.velX, obj.velY, obj.maxVelX, obj.maxVelY, obj.maxAccX, obj.maxAccY, obj.collisionWidth, obj.id...
 								] = varargin{:};
 					else
 						error([class(obj) '(' getTypes(varargin{:}) ') constructor doesn''t exist.']);
@@ -85,15 +86,19 @@ classdef Crane
 		function disp(obj)
 			if numel(obj)<=1
 				fprintf('<a href = "matlab:help %s">%s</a>\n',class(obj),class(obj));
+				fprintf('\t id: %2d\n',obj.id);
 				fprintf('\t position:\t[%2.2f %2.2f]\n',obj.x,obj.y);
 				fprintf('\t velocity:\t[%2.2f %2.2f]\n',obj.velX,obj.velY);
 				fprintf('\t max velocity:\t\t[%2.2f %2.2f]\n',obj.maxVelX,obj.maxVelY);
 				fprintf('\t max acceleration:\t[%2.2f %2.2f]\n',obj.maxAccX,obj.maxAccY);
 				fprintf('\t collision width:\t %2.2f\n',obj.collisionWidth);
-				fprintf('\t status:%s\n',evalc('disp(obj.status)'));
+				fprintf('\t status:%s',evalc('disp(obj.status)'));
 			else
 				fprintf('\t<a href = "matlab:help %s">%s</a> array with dimensions [%s]\n',class(obj),class(obj),num2str(size(obj)));
 			end
+		end
+		function breakdist= getBreakDistance(obj)
+			breakdist = [obj.velX^2/2/obj.maxAccX obj.velY^2/2/obj.maxAccY];
 		end
 	end
 end
