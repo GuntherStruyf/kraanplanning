@@ -15,6 +15,7 @@ classdef Crane
 	%	curTaskID:	the id of the current task the crane is executing
 	%	actionStart:the time at which the current action of the crane has
 	%				started
+	%	Xclaimed:	the x positions of the terminal this cranes has claimed
 	%
 	%CONSTRUCTOR:
 	%	Crane(Xspan, Xstart)
@@ -40,6 +41,7 @@ classdef Crane
 		status			= CraneStatus.Disabled;
 		curTaskID		= 0;
 		actionStart		= 0;
+		Xclaimed		= [];
 	end
 	
 	methods(Static)
@@ -92,13 +94,17 @@ classdef Crane
 				fprintf('\t max velocity:\t\t[%2.2f %2.2f]\n',obj.maxVelX,obj.maxVelY);
 				fprintf('\t max acceleration:\t[%2.2f %2.2f]\n',obj.maxAccX,obj.maxAccY);
 				fprintf('\t collision width:\t %2.2f\n',obj.collisionWidth);
-				fprintf('\t status:%s',evalc('disp(obj.status)'));
+				fprintf('\t Xclaimed: [');fprintf(' %d ',obj.Xclaimed(:)');
+				fprintf(']\n\t status:%s',evalc('disp(obj.status)'));
 			else
 				fprintf('\t<a href = "matlab:help %s">%s</a> array with dimensions [%s]\n',class(obj),class(obj),num2str(size(obj)));
 			end
 		end
 		function breakdist= getBreakDistance(obj)
 			breakdist = [obj.velX^2/2/obj.maxAccX obj.velY^2/2/obj.maxAccY];
+		end
+		function XRange = getXRange(obj)
+			XRange = obj.Xstart + [0:obj.Xspan-1];
 		end
 	end
 end

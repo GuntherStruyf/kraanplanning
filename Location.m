@@ -1,5 +1,8 @@
 classdef Location
 	%LOCATION contains x,y,z coordinates
+	% Location(double x, double y, double z)
+	% Location(double [xyz])
+	% Location(Location loc)
 	
 	properties
 		x=0;
@@ -16,6 +19,8 @@ classdef Location
 					if length(varargin{1})==3
 						p=num2cell(varargin{1});
 						[obj.x obj.y obj.z] = p{:};
+					elseif isa(varargin{1},class(obj))
+						obj=varargin{1};
 					else
 						error([class(obj) '(' getTypes(varargin{:}) ') constructor doesn''t exist.']);
 					end
