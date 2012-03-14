@@ -3,6 +3,7 @@
 clear
 close all
 clc
+tic
 
 %% SETTINGS
 
@@ -28,9 +29,9 @@ end
 
 %% SIMULATE TASK EXECUTION
 
-[total_time , craneposX, craneposY] = simulate_planning(tasks, cranes, exec_order, handlingTime, terminal);
+[total_time , craneposX, craneposY] = simulate_planning(tasks, cranes, exec_order,ordered_taskpairs, handlingTime, terminal);
 fprintf('Total execution time: %4ds\n',total_time);
-
+toc
 
 
 %% PRODUCE NICE IMAGES

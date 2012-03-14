@@ -1,4 +1,4 @@
-function [total_time , craneposX, craneposY]= simulate_planning( tasks, cranes, exec_order, handlingTime, initial_terminal_state)
+function [total_time , craneposX, craneposY]= simulate_planning( tasks, cranes, exec_order,ordered_taskpairs, handlingTime, initial_terminal_state)
 %SIMULATE_PLANNING simulate the proposed execution order of the tasks
 % at each time increment: either progress each crane's current task or pick
 % the next task on the task list (respecting specified execution order)
@@ -93,7 +93,7 @@ function [total_time , craneposX, craneposY]= simulate_planning( tasks, cranes, 
 						FLOW_COMPLETED=true;
 %--------------------------------------------------------------------------
 					case CraneStatus.AwaitingExecOrderClearance
-						if ValidateExecOrder(cranes(i).curTaskID,tasks,exec_order)
+						if ValidateExecOrder(cranes(i).curTaskID,tasks,ordered_taskpairs)
 							cranes(i).status = CraneStatus.AwaitingOriginClearance;
 							cranes(i).actionStart=t;
 							cranes(i).Xclaimed = [];

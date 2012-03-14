@@ -1,0 +1,14 @@
+TODO
+
+- fout meten (>20min)
+
+- taken verdelen onder kranen -> buiten simulatie, hoort bij de taakvolgorde opstelling
+
+- task picking: opgegeven taakverdeling respecteren, als een taak nog niet kan worden uitgevoerd, simpelweg wachten en niet met de volgende beginnen
+
+
+- 5 trein/1truck laden/1 truck rijden/ 6 terminal
+
+- toch alles omzetten om te werken in meters ipv containers
+
+- truck kan bewegen tussen taken in

@@ -1,7 +1,8 @@
 
 data_file = 'setup.mat';
+force_newdata = true;
 
-if exist(data_file,'file')
+if exist(data_file,'file') && ~force_newdata
 %% load data from file (if one is present)
 	planning_data = load(data_file);
 	% split structure in separate variables
@@ -18,8 +19,8 @@ else
 	container_height	= 2.591;	% 8.5ft
 
 	% key parameters:
-	Ncontainers = 50;			% number of containers in the terminal
-	Ntrucks = 10;				% number of trucks
+	Ncontainers = 150;			% number of containers in the terminal
+	Ntrucks = 100;				% number of trucks
 	truckLanes = 13;			% number of adjacent trucklanes
 	terminal_dim = [29 5 4];	% dimensions of the terminal, [length width height]
 	dropZoneWidth = 5;			% dropzone width
@@ -95,8 +96,10 @@ else
 							'MaxCrane_gantry_speed',MaxCrane_gantry_speed	, ...
 							'MaxCrane_track_acceleration',	MaxCrane_track_acceleration	, ...
 							'MaxCrane_gantry_acceleration',	MaxCrane_gantry_acceleration);
-						
-	save(data_file,'-struct','planning_data'); % actual saving to file
+	
+	if ~force_newdata
+		save(data_file,'-struct','planning_data'); % actual saving to file
+	end
 	clear planning_data i; % clear further unused variables from workspace
 	
 	fprintf('Input generated and saved to %s\n',data_file); % displaying info to user
