@@ -5,6 +5,7 @@ classdef Task
 	%	loc_origin:			The location of the container to move
 	%	loc_destination:	The destination of this container
 	%	EarliestStartTime:	Earliest time to start this task
+	%	finishTime:			Time when the task is finished
 	%	TruckID:			The ID of the related truck, 0 if there is none
 	%
 	%CONSTRUCTOR:
@@ -15,6 +16,7 @@ classdef Task
 		loc_origin			= Location.Zero();
 		loc_destination		= Location.Zero();
 		earliestStartTime	= 0;
+		finishTime			= 0;
 		truckID				= 0;
 		status				= TaskStatus.Awaiting;
 	end

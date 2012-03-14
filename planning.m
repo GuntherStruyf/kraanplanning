@@ -29,9 +29,18 @@ end
 
 %% SIMULATE TASK EXECUTION
 
-[total_time , craneposX, craneposY] = simulate_planning(tasks, cranes, exec_order,ordered_taskpairs, handlingTime, terminal);
+[total_time , tasks, craneposX, craneposY] = simulate_planning(tasks, cranes, exec_order,ordered_taskpairs, handlingTime, terminal);
 fprintf('Total execution time: %4ds\n',total_time);
 toc
+
+%% CALCULATE TOTAL GOAL FUNCTION VALUE
+
+goal_value=0;
+allowable_time=20*60;
+for i=1:numel(tasks)
+	goal_value = goal_value + max(0, tasks(i).finishTime-tasks(i).earliestStartTime);
+end
+fprintf('Goal value = %d\n',goal_value);
 
 
 %% PRODUCE NICE IMAGES

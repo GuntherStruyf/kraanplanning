@@ -1,4 +1,4 @@
-function [total_time , craneposX, craneposY]= simulate_planning( tasks, cranes, exec_order,ordered_taskpairs, handlingTime, initial_terminal_state)
+function [total_time ,tasks, craneposX, craneposY]= simulate_planning( tasks, cranes, exec_order,ordered_taskpairs, handlingTime, initial_terminal_state)
 %SIMULATE_PLANNING simulate the proposed execution order of the tasks
 % at each time increment: either progress each crane's current task or pick
 % the next task on the task list (respecting specified execution order)
@@ -188,6 +188,7 @@ function [total_time , craneposX, craneposY]= simulate_planning( tasks, cranes, 
 							% destination was reached
 							% thus task completed
 							tasks(cranes(i).curTaskID).status=TaskStatus.Completed;
+							tasks(cranes(i).curTaskID).finishTime=t;
 							fprintf('Task %3d completed\n',cranes(i).curTaskID);
 							cranes(i).status = CraneStatus.AwaitingOrders;
 							cranes(i).actionStart=t;

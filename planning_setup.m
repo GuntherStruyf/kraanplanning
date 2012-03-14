@@ -99,10 +99,12 @@ else
 	
 	if ~force_newdata
 		save(data_file,'-struct','planning_data'); % actual saving to file
+		fprintf('Input generated and saved to %s\n',data_file); % displaying info to user
 	end
 	clear planning_data i; % clear further unused variables from workspace
 	
-	fprintf('Input generated and saved to %s\n',data_file); % displaying info to user
+	fprintf('Loaded %d tasks\n',numel(tasks));
+	
 end
 
 
