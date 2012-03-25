@@ -38,25 +38,26 @@
 	%\path [line] (disabled) -- (awaiting_orders);
 	%\path [line,dashed] (start_signal) -- (disabled);
 	
-	\node [cloud] (start_signal) {Start signal};
-	
+	\node [cloud] (start_signal) {Start signal};	
 	\node [block, below of=start_signal,yshift=1cm] (awaiting_orders) {Awaiting orders};
-	
 	\node [decision, right of=awaiting_orders] (decision_taskassign) {New task available?};
-	
 	\node [block, right of=decision_taskassign] (awaiting_preliminary_tasks) {Awaiting preliminary tasks};
-	
 	\node [decision, right of=awaiting_preliminary_tasks] (decision_preliminarytasksfinished) {Preliminary tasks finished?};
+	\node [block, right of=decision_preliminarytasksfinished] (awaiting_physical_clearance_A) {Awaiting physical clearance};
 	
-	\node [block, right of=decision_preliminarytasksfinished] (awaiting_physical_clearance) {Awaiting physical clearance};
+	\node [decision, below of=awaiting_physical_clearance_A] (decision_taskspacefree_A) {Task space free to claim?};
+	\node [block, below of=decision_taskspacefree_A] (movetoorigin){Move to origin};
+	\node [decision, left of=movetoorigin] (origin_arrival) {Arrival at origin?};
+	\node [block, left of=origin_arrival](loadcontainer){Loading container};
+	\node [decision, left of=loadcontainer] (loadingfinished) {Loading finished?};
+	\node [block, left of=loadingfinished](awaiting_physical_clearance_B) {Awaiting physical clearance};
+	\node [decision, below of=awaiting_physical_clearance_B] (decision_taskspacefree_B) {Task space free to claim};
 	
 	
-	
-	
-	\node [block, below of=awaiting_orders] (evaluate) {evaluate candidate models};
-	\node [block, left of=evaluate, node distance=3cm] (update) {update model};
-	\node [decision, below of=evaluate] (decide) {is best candidate better?};
-	\node [block, below of=decide, node distance=3cm] (stop) {stop};
+	%\node [block, below of=awaiting_orders] (evaluate) {evaluate candidate models};
+	%\node [block, left of=evaluate, node distance=3cm] (update) {update model};
+	%\node [decision, below of=evaluate] (decide) {is best candidate better?};
+	%\node [block, below of=decide, node distance=3cm] (stop) {stop};
 	
 	
 	% Draw edges
@@ -67,12 +68,15 @@
 	\path [line] (decision_taskassign) -- node [midway, above] {yes} (awaiting_preliminary_tasks.west);
 	\path [line] (awaiting_preliminary_tasks) -- (decision_preliminarytasksfinished);
 	\path [line] (decision_preliminarytasksfinished) |- ($(decision_preliminarytasksfinished.south) + (0.0,-0.7)$) -| node[near start, above]{no} (awaiting_preliminary_tasks.south);
-	\path [line] (decision_preliminarytasksfinished) -- node [midway, above] {yes} (awaiting_physical_clearance.west);
-	
-	\path [line] (evaluate) -- (decide);
-	\path [line] (decide) -| node [near start] {yes} (update);
-	\path [line] (update) |- (awaiting_orders);
-	\path [line] (decide) -- node {no}(stop);
+	\path [line] (decision_preliminarytasksfinished) -- node [midway, above] {yes} (awaiting_physical_clearance_A.west);
+	\path [line] (awaiting_physical_clearance_A) --  (decision_taskspacefree_A);
+	\path [line] (decision_taskspacefree_A) -| ($(decision_taskspacefree_A.east) + (0.7,0.0)$) |- node[near start, right]{no} (awaiting_physical_clearance_A.east);
+	\path [line] (decision_taskspacefree_A) -- (movetoorigin);
+
+	%\path [line] (evaluate) -- (decide);
+	%\path [line] (decide) -| node [near start] {yes} (update);
+	%\path [line] (update) |- (awaiting_orders);
+	%\path [line] (decide) -- node {no}(stop);
 \end{tikzpicture}
 
 
