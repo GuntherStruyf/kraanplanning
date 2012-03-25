@@ -1,0 +1,79 @@
+\documentclass{article}
+
+%\usepackage{amsmath}
+%\usepackage{graphicx}
+%\usepackage[process=auto,crop=pdfcrop]{pstool}
+\usepackage[colorlinks=true, linkcolor=black, citecolor=black, filecolor=black,urlcolor=black, bookmarks=true]{hyperref}
+\usepackage[all]{hypcap} % to correctly refer to figures and tables
+
+\usepackage[latin1]{inputenc}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,calc}
+
+% rather don't break words:
+\hyphenpenalty 10000
+\exhyphenpenalty 10000
+% or specify desired hyphenation:
+\hyphenation{de-ce-le-ra-tion}
+
+
+\title{Calculating the velocity profile for maximum acceleration}
+\author{Gunther Struyf}
+\date{\today}
+
+\begin{document}
+\pagestyle{empty}
+
+% Define block styles
+
+\tikzstyle{decision} = [diamond, draw, fill=blue!20, text width=4.5em, text badly centered, inner sep=0pt, node distance=3cm]
+\tikzstyle{block} = [rectangle, draw, fill=blue!20, text width=5em, text centered, rounded corners, minimum height=4em]
+\tikzstyle{line} = [draw, very thick, -latex']
+\tikzstyle{cloud} = [draw, ellipse,fill=red!20, minimum height=2em, node distance=3cm]
+
+
+\begin{tikzpicture}[node distance = 3cm, auto]
+	% Place nodes
+	%\node [block] (disabled) {Disabled};
+	%\path [line] (disabled) -- (awaiting_orders);
+	%\path [line,dashed] (start_signal) -- (disabled);
+	
+	\node [cloud] (start_signal) {Start signal};
+	
+	\node [block, below of=start_signal,yshift=1cm] (awaiting_orders) {Awaiting orders};
+	
+	\node [decision, right of=awaiting_orders] (decision_taskassign) {New task available?};
+	
+	\node [block, right of=decision_taskassign] (awaiting_preliminary_tasks) {Awaiting preliminary tasks};
+	
+	\node [decision, right of=awaiting_preliminary_tasks] (decision_preliminarytasksfinished) {Preliminary tasks finished?};
+	
+	\node [block, right of=decision_preliminarytasksfinished] (awaiting_physical_clearance) {Awaiting physical clearance};
+	
+	
+	
+	
+	\node [block, below of=awaiting_orders] (evaluate) {evaluate candidate models};
+	\node [block, left of=evaluate, node distance=3cm] (update) {update model};
+	\node [decision, below of=evaluate] (decide) {is best candidate better?};
+	\node [block, below of=decide, node distance=3cm] (stop) {stop};
+	
+	
+	% Draw edges
+	
+	\path [line,dashed] (start_signal) -- (awaiting_orders);
+	\path [line] (awaiting_orders) -- (decision_taskassign);
+	\path [line] (decision_taskassign) |- ($(decision_taskassign.south) + (0.0,-0.7)$) -| node[near start, above]{no} (awaiting_orders.south);
+	\path [line] (decision_taskassign) -- node [midway, above] {yes} (awaiting_preliminary_tasks.west);
+	\path [line] (awaiting_preliminary_tasks) -- (decision_preliminarytasksfinished);
+	\path [line] (decision_preliminarytasksfinished) |- ($(decision_preliminarytasksfinished.south) + (0.0,-0.7)$) -| node[near start, above]{no} (awaiting_preliminary_tasks.south);
+	\path [line] (decision_preliminarytasksfinished) -- node [midway, above] {yes} (awaiting_physical_clearance.west);
+	
+	\path [line] (evaluate) -- (decide);
+	\path [line] (decide) -| node [near start] {yes} (update);
+	\path [line] (update) |- (awaiting_orders);
+	\path [line] (decide) -- node {no}(stop);
+\end{tikzpicture}
+
+
+\end{document}
