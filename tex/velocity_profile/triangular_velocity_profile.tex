@@ -1,0 +1,100 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[process=auto,crop=pdfcrop]{pstool}
+\usepackage[colorlinks=true, linkcolor=black, citecolor=black, filecolor=black,urlcolor=black, bookmarks=true]{hyperref}
+\usepackage[all]{hypcap} % to correctly refer to figures and tables
+\hyphenation{de-ce-le-ra-tion}
+
+\title{Calculating the velocity profile for maximum acceleration}
+\author{Gunther Struyf}
+\date{\today}
+% Hint: \title{what ever}, \author{who care} and \date{when ever} could stand 
+% before or after the \begin{document} command 
+% BUT the \maketitle command MUST come AFTER the \begin{document} command! 
+\begin{document}
+\maketitle
+
+\section{No velocity limit\label{sec:nolimit}}
+	When an object travels an imposed distance with maximum acceration (or deceleration), following equations apply:
+	\begin{eqnarray}
+		a &= a_{max}	&= c^{te}\\
+		v &= \int a dt	&= a_{max}\ t
+	\end{eqnarray}
+	This results in a triangular velocity profile, pictured in figure~\ref{fig:triangular_vel_profile}.\\
+	\begin{figure}[ht!]
+		\centering
+		\psfragfig[width=0.7\linewidth]{images/matlab/triangular_velocity_profile}
+		\caption{Triangular velocity profile. In the first phase the velocity is increasing, in the second phase velocity is decreasing in order to come to a halt at the destination.}
+		\label{fig:triangular_vel_profile}
+	\end{figure}
+	
+	In this case the covered distance is
+	\begin{align}
+		\Delta x	&= \int_{t_0}^{t_e} v(t) dt\\
+					&= \int_0^{\Delta t_1} (v_0+a_{max} t) dt + \int_0^{\Delta t_2} ((v_0+a_{max} \Delta t_1)-a_{max} t) dt
+	\end{align}
+	which simplifies with a change of integral limits of the second integral to:
+	\begin{align}
+		\Delta x	&= \int_0^{\Delta t_1} (v_0+a_{max} t) dt + \int_0^{\Delta t_2} (a_{max} t) dt			\notag\\
+					&= v_0 \Delta t_1 + a_{max} \frac{(\Delta t_1)^2}{2} + a_{max} \frac{(\Delta t_2)^2}{2}	\notag\\
+					&= v_0 \Delta t_1 + a_{max} \frac{(\Delta t_1)^2 + (\Delta t_2)^2}{2}					\label{eq:deltax}
+	\end{align}
+	This equation~\eqref{eq:deltax} introduces two new variables: $\Delta t_1$ and $\Delta t_2$. For solving these variables the maximum attainable velocity $v_{top}$ is also introduced for stating the following equations:
+	\begin{align}
+		v_{top} &= v_0+a_{max} \Delta t_1	\ ,\label{eq:vtop1}\\
+		v_{top} &= a_{max} \Delta t_2 	\ .\label{eq:vtop2}
+	\end{align}
+	When these equations~\eqref{eq:vtop1}-\eqref{eq:vtop2} subsequently are solved for $\Delta t_1$ and $\Delta t_2$, the substitution of the result in~\eqref{eq:deltax} gives
+	\begin{align}
+		\Delta x 	&= v_0 \left(\frac{v_{top}-v_0}{a_{max}} \right)+ a_{max} \frac{ \left(\frac{v_{top}-v_0}{a_{max}}\right)^2 + \left(\frac{v_{top}}{a_{max}}\right)^2}{2}\\
+					&= v_{top}^2 \left(\frac{1}{a_{max}} \right) - \frac{v_0^2}{2\ a_{max}}
+	\end{align}
+	which can be solved for $v_{top}$ as
+	\begin{equation}
+		v_{top} = \sqrt{a_{max}\Delta x + \frac{v_0^2}{2}} \ .\label{eq:vtop}
+	\end{equation}
+	$\Delta t_1$ and $\Delta t_2$ follow from filling~\eqref{eq:vtop} in into~\eqref{eq:vtop1}-\eqref{eq:vtop2}.
+\section{Velocity limit\label{sec:limit}}
+	When the velocity is limited to $v_{max}$, the triangular velocity profile from figure~\ref{fig:triangular_vel_profile} changes to a truncated triangle (see figure~\ref{fig:truncated_triangular_vel_profile}) when $v_{top} > v_{max}$.\\
+	\begin{figure}[ht!]
+		\centering
+		\psfragfig[width=0.7\linewidth]{images/matlab/trunc_triangular_velocity_profile}
+		\caption{Truncated triangular velocity profile. In the first phase the velocity is increasing, in the second phase the object has reached maximum velocity, in the third phase the velocity decreases in order to come to a halt at the destination.}
+		\label{fig:truncated_triangular_vel_profile}
+	\end{figure}
+	The time intervals $\Delta t_1$ and $\Delta t_3$ are easy to determine, as $v_{max}$ is known:
+	\begin{align}
+		\Delta t_1 &= (v_{max}-v_0)/a_{max} \label{eq:dt1}\\
+		\Delta t_3 &= v_{max}/a_{max}	\label{eq:dt3}
+	\end{align}
+	Analogous to the previous section the covered distance of these two parts is:
+	\begin{align}
+		\Delta x_1 &= \frac{v_0+v_{max}}{2} \Delta t_1\\
+		\Delta x_3 &= a_{max}\frac{(\Delta t_3)^2}{2}
+	\end{align}
+	With these, the distance $\Delta x_2$ is known and thus also $\Delta t_2$:
+	\begin{align}
+		\Delta x_2 &= \Delta x - \Delta x_1 - \Delta x_3\\
+		\Delta t_2 &= \Delta x_2 / v_{max}
+	\end{align}
+	
+\section{Position}
+	Position of both situation is obtainable by integrating the velocity:
+	\begin{equation}
+		x(t) = \int v(t) dt \ ,
+	\end{equation}
+	which results in figure~\ref{fig:position_nolimit} and~\ref{fig:position_limited} for respectively section~\ref{sec:nolimit} and~\ref{sec:limit}.
+	\begin{figure}[ht!]
+		\centering
+		\psfragfig[width=0.7\linewidth]{images/matlab/position_nolimit}
+		\caption{Position of the object, moving with maximum acceleration/deceleration, without velocity limit.}
+		\label{fig:position_nolimit}
+	\end{figure}\begin{figure}[ht!]
+		\centering
+		\psfragfig[width=0.7\linewidth]{images/matlab/position_limited}
+		\caption{Position of the object, moving with maximum acceleration/deceleration, respecting the velocity limit $v_{max}$.}
+		\label{fig:position_limited}
+	\end{figure}
+\end{document}
