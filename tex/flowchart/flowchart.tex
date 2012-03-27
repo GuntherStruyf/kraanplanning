@@ -5,6 +5,7 @@
 %\usepackage[process=auto,crop=pdfcrop]{pstool}
 \usepackage[colorlinks=true, linkcolor=black, citecolor=black, filecolor=black,urlcolor=black, bookmarks=true]{hyperref}
 \usepackage[all]{hypcap} % to correctly refer to figures and tables
+\usepackage[a4paper,inner=1cm,outer=1cm, top=3.5cm, bottom=3.5cm, footskip=1.5cm]{geometry}
 
 \usepackage[latin1]{inputenc}
 \usepackage{tikz}
@@ -31,7 +32,6 @@
 \tikzstyle{line} = [draw, very thick, -latex']
 \tikzstyle{cloud} = [draw, ellipse,fill=red!20, minimum height=2em, node distance=3cm]
 
-
 \begin{tikzpicture}[node distance = 3cm, auto]
 	% Place nodes
 	%\node [block] (disabled) {Disabled};
@@ -49,19 +49,17 @@
 	\node [block, below of=decision_taskspacefree_A] (movetoorigin){Move to origin};
 	\node [decision, left of=movetoorigin] (origin_arrival) {Arrival at origin?};
 	\node [block, left of=origin_arrival](loadcontainer){Loading container};
-	\node [decision, left of=loadcontainer] (loadingfinished) {Loading finished?};
-	\node [block, left of=loadingfinished](awaiting_physical_clearance_B) {Awaiting physical clearance};
+	\node [decision, left of=loadcontainer] (decision_loadingfinished) {Loading finished?};
+	\node [block, left of=decision_loadingfinished](awaiting_physical_clearance_B) {Awaiting physical clearance};
 	\node [decision, below of=awaiting_physical_clearance_B] (decision_taskspacefree_B) {Task space free to claim};
 	
-	
-	%\node [block, below of=awaiting_orders] (evaluate) {evaluate candidate models};
-	%\node [block, left of=evaluate, node distance=3cm] (update) {update model};
-	%\node [decision, below of=evaluate] (decide) {is best candidate better?};
-	%\node [block, below of=decide, node distance=3cm] (stop) {stop};
+	\node [block, below of=decision_taskspacefree_B] (movetodestination){Move to destination};
+	\node [decision, right of=movetodestination] (destination_arrival) {Arrival at destination?};
+	\node [block, right of=destination_arrival](unloadcontainer){Unloading container};
+	\node [decision, right of=unloadcontainer] (decision_unloadingfinished) {Unloading finished?};
 	
 	
 	% Draw edges
-	
 	\path [line,dashed] (start_signal) -- (awaiting_orders);
 	\path [line] (awaiting_orders) -- (decision_taskassign);
 	\path [line] (decision_taskassign) |- ($(decision_taskassign.south) + (0.0,-0.7)$) -| node[near start, above]{no} (awaiting_orders.south);
@@ -71,8 +69,25 @@
 	\path [line] (decision_preliminarytasksfinished) -- node [midway, above] {yes} (awaiting_physical_clearance_A.west);
 	\path [line] (awaiting_physical_clearance_A) --  (decision_taskspacefree_A);
 	\path [line] (decision_taskspacefree_A) -| ($(decision_taskspacefree_A.east) + (0.7,0.0)$) |- node[near start, right]{no} (awaiting_physical_clearance_A.east);
-	\path [line] (decision_taskspacefree_A) -- (movetoorigin);
-
+	\path [line] (decision_taskspacefree_A) -- node [near start,right]{yes} (movetoorigin);
+	\path [line] (movetoorigin) -- (origin_arrival);
+	\path [line] (origin_arrival) |- ($(origin_arrival.south) + (0.0,-0.7)$) -| node[near start, above]{no} (movetoorigin);
+	\path [line] (origin_arrival) -- node [midway, above] {yes} (loadcontainer.east);
+	\path [line] (loadcontainer) -- (decision_loadingfinished);
+	\path [line] (decision_loadingfinished) |- ($(decision_loadingfinished.south) + (0.0,-0.7)$) -| node[near start,above]{no} (loadcontainer);
+	\path [line] (decision_loadingfinished) -- (awaiting_physical_clearance_B.east);
+	\path [line] (awaiting_physical_clearance_B) -- (decision_taskspacefree_B);
+	\path [line] (decision_taskspacefree_B) -| ($(decision_taskspacefree_B.west) + (-0.7,0.0)$) |- node[near start, right]{no} (awaiting_physical_clearance_B.west);
+	\path [line] (decision_taskspacefree_B) -- node [near start,right]{yes} (movetodestination);
+	\path [line] (movetodestination) -- (destination_arrival);
+	\path [line] (destination_arrival) |- ($(destination_arrival.south) + (0.0,-0.7)$) -| node[near start, above]{no} (movetodestination);
+	\path [line] (destination_arrival) -- node [midway, above] {yes} (unloadcontainer.west);
+	\path [line] (unloadcontainer) -- (decision_unloadingfinished);
+	\path [line] (decision_unloadingfinished) |- ($(decision_unloadingfinished.south) + (0.0,-0.7)$) -| node[near start,above]{no} (unloadcontainer);
+	
+	\path [line] (decision_unloadingfinished) -| node[near start,right]{yes} ($(decision_unloadingfinished.south east) + (0.7,-1.7)$) -| ($(awaiting_orders.west) + (-1.7,0.0)$) -- (awaiting_orders.west);
+	
+		
 	%\path [line] (evaluate) -- (decide);
 	%\path [line] (decide) -| node [near start] {yes} (update);
 	%\path [line] (update) |- (awaiting_orders);
