@@ -1,0 +1,98 @@
+\documentclass{article}
+
+%\usepackage{amsmath}
+%\usepackage{graphicx}
+%\usepackage[process=auto,crop=pdfcrop]{pstool}
+\usepackage[colorlinks=true, linkcolor=black, citecolor=black, filecolor=black,urlcolor=black, bookmarks=true]{hyperref}
+\usepackage[all]{hypcap} % to correctly refer to figures and tables
+\usepackage[a4paper,inner=1cm,outer=1cm, top=3.5cm, bottom=3.5cm, footskip=1.5cm]{geometry}
+
+\usepackage[latin1]{inputenc}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,calc}
+
+% rather don't break words:
+\hyphenpenalty 10000
+\exhyphenpenalty 10000
+% or specify desired hyphenation:
+\hyphenation{de-ce-le-ra-tion}
+
+
+\title{Calculating the velocity profile for maximum acceleration}
+\author{Gunther Struyf}
+\date{\today}
+
+\begin{document}
+\pagestyle{empty}
+
+% Define block styles
+
+\tikzstyle{decision} = [diamond, draw, fill=blue!20, text width=4.5em, text badly centered, inner sep=1pt, node distance=3cm]
+\tikzstyle{block} = [rectangle, draw, fill=blue!20, text width=5em, text centered, rounded corners, minimum height=4em]
+\tikzstyle{line} = [draw, very thick, -latex']
+\tikzstyle{cloud} = [draw, ellipse,fill=red!20, minimum height=2em, node distance=3cm]
+
+\begin{tikzpicture}[node distance = 3cm, auto]
+	% Place nodes
+	%\node [block] (disabled) {Disabled};
+	%\path [line] (disabled) -- (awaiting_orders);
+	%\path [line,dashed] (start_signal) -- (disabled);
+	
+	\node [cloud] (start_signal) {Start signaal};	
+	\node [block, below of=start_signal,yshift=1cm] (awaiting_orders) {Wachten op orders};
+	\node [decision, right of=awaiting_orders] (decision_taskassign) {Taak beschikbaar?};
+	\node [block, right of=decision_taskassign] (awaiting_preliminary_tasks) {Wachten op voorafgaande taken};
+	\node [decision, right of=awaiting_preliminary_tasks] (decision_preliminarytasksfinished) {Voorafgaande taken klaar?};
+	\node [block, right of=decision_preliminarytasksfinished] (awaiting_physical_clearance_A) {Wachten op fysieke toegang};
+	
+	\node [decision, below of=awaiting_physical_clearance_A] (decision_taskspacefree_A) {Taak ruimte vrij om te claimen?};
+	\node [block, below of=decision_taskspacefree_A] (movetoorigin){Beweeg naar de oorsprong};
+	\node [decision,  below of=movetoorigin] (origin_arrival) {Aangekomen op de oorsprong?};
+	\node [block,  below of=origin_arrival](loadcontainer){Container laden};
+
+	\node [decision, left of=loadcontainer] (decision_loadingfinished) {Laden klaar?};
+	\node [block, left of=decision_loadingfinished](awaiting_physical_clearance_B) {Wachten op fysieke toegang};
+	\node [decision, left of=awaiting_physical_clearance_B] (decision_taskspacefree_B) {Taakruimte vrij om te claimen?};	
+	\node [block, left of=decision_taskspacefree_B] (movetodestination){Beweeg naar de bestemming};
+
+	\node [decision, above of=movetodestination] (destination_arrival) {Aangekomen op de bestemming?};
+	\node [block, above of=destination_arrival](unloadcontainer){Container afladen};
+	\node [decision, above of=unloadcontainer] (decision_unloadingfinished) {Afladen klaar?};
+	
+	
+	% Draw edges
+	\path [line,dashed] (start_signal) -- (awaiting_orders);
+	\path [line] (awaiting_orders) -- (decision_taskassign);
+	\path [line] (decision_taskassign) |- ($(decision_taskassign.south) + (0.0,-0.5)$) -| node[near start, above]{nee} (awaiting_orders.south);
+	\path [line] (decision_taskassign) -- node [midway, above] {ja} (awaiting_preliminary_tasks.west);
+	\path [line] (awaiting_preliminary_tasks) -- (decision_preliminarytasksfinished);
+	\path [line] (decision_preliminarytasksfinished) |- ($(decision_preliminarytasksfinished.south) + (0.0,-0.7)$) -| node[near start, above]{nee} (awaiting_preliminary_tasks.south);
+	\path [line] (decision_preliminarytasksfinished) -- node [midway, above] {ja} (awaiting_physical_clearance_A.west);
+	\path [line] (awaiting_physical_clearance_A) --  (decision_taskspacefree_A);
+	\path [line] (decision_taskspacefree_A) -| ($(decision_taskspacefree_A.east) + (0.7,0.0)$) |- node[near start]{nee} (awaiting_physical_clearance_A.east);
+	\path [line] (decision_taskspacefree_A) -- node [midway]{ja} (movetoorigin);
+	\path [line] (movetoorigin) -- (origin_arrival);
+	\path [line] (origin_arrival) -| ($(origin_arrival.east) + (0.7, 0.0)$) |- node[near start]{nee} (movetoorigin);
+	\path [line] (origin_arrival) -- node [midway] {ja} (loadcontainer);
+	\path [line] (loadcontainer) -- (decision_loadingfinished);
+	\path [line] (decision_loadingfinished) |- ($(decision_loadingfinished.south) + (0.0,-0.7)$) -| node[near start]{nee} (loadcontainer);
+	\path [line] (decision_loadingfinished) --  node [midway] {ja} (awaiting_physical_clearance_B);
+	\path [line] (awaiting_physical_clearance_B) -- (decision_taskspacefree_B);
+	\path [line] (decision_taskspacefree_B) |- ($(decision_taskspacefree_B.south) + (0.0,-0.7)$) -| node[near start]{nee} (awaiting_physical_clearance_B);
+	\path [line] (decision_taskspacefree_B) -- node [midway]{ja} (movetodestination);
+	\path [line] (movetodestination) -- (destination_arrival);
+	\path [line] (destination_arrival) -| ($(destination_arrival.west) + (-0.7,0.0)$) |- node[near start]{nee} (movetodestination);
+	\path [line] (destination_arrival) -- node [midway] {ja} (unloadcontainer);
+	\path [line] (unloadcontainer) -- (decision_unloadingfinished);
+	\path [line] (decision_unloadingfinished) -| ($(decision_unloadingfinished.west) + (-0.7,0.0)$) |- node[near start]{nee} (unloadcontainer);
+	\path [line] (decision_unloadingfinished.north)  -| node[near end, right]{ja}  ($(awaiting_orders.west) + (-0.7,0.0)$) -- (awaiting_orders.west);
+	
+		
+	%\path [line] (evaluate) -- (decide);
+	%\path [line] (decide) -| node [near start] {ja} (update);
+	%\path [line] (update) |- (awaiting_orders);
+	%\path [line] (decide) -- node {nee}(stop);
+\end{tikzpicture}
+
+
+\end{document}
