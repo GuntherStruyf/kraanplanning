@@ -31,9 +31,9 @@ else
 	craneWidth = 10;			% width of a crane (in meter)
 
 	% Maximum speed of the crane's track (m/s)
-	MaxCrane_track_speed = 1/container_length;	
+	MaxCrane_track_speed = container_length;	
 	% Maximum speed of the crane's gantry (m/s)
-	MaxCrane_gantry_speed = 1/container_width;
+	MaxCrane_gantry_speed = container_width;
 	% Maximum acceleration of the crane's track (m/s^2)
 	MaxCrane_track_acceleration = MaxCrane_track_speed/5; % so max speed is reached in 5s	
 	% Maximum acceleration of the crane's gantry(m/s^2)				
