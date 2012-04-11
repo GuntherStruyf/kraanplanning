@@ -1,5 +1,5 @@
 TEXINPUTS := ${PWD}:${PWD}/styles
-JOBNAME := flowchart
+JOBNAME := flowchart_square_NE
 
 pdf:
 	@echo ${TEXINPUTS}
